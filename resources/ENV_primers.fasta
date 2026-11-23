@@ -1,0 +1,4 @@
+>forward_adapter clc_strand=Plus
+GCTTCTCATCTCAAACCCGC
+>reverse_adapter clc_strand=Minus
+GGGTTGCCCGTAGGCGGT

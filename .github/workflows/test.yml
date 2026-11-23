@@ -1,0 +1,61 @@
+name: test
+
+# Manual only: run it from the Actions tab (Run workflow) or with `gh workflow run test.yml`,
+# for example before handing the repository to someone or after changing workflow/envs/.
+on:
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    name: synthetic dataset end to end
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          environment-file: environment.yml
+          activate-environment: korv
+          channel-priority: strict
+
+      - name: Cache the rule environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.korv_conda_envs
+          key: rule-envs-${{ runner.os }}-${{ hashFiles('workflow/envs/*.yaml') }}
+
+      - name: Lint
+        run: snakemake --lint --configfile .test/config.yaml
+
+      - name: Stages 1-3 (suggestions)
+        run: snakemake --cores 2 --configfile .test/config.yaml --conda-prefix ~/.korv_conda_envs
+
+      - name: Stage 4 (report)
+        run: >
+          snakemake --cores 2 --configfile .test/config.yaml --conda-prefix ~/.korv_conda_envs
+          --config subtype_assignments=.test/subtype_assignments.tsv
+
+      - name: Check the outputs
+        run: |
+          for f in subtype_suggestions.xlsx subtype_review.html final_result.xlsx sample_read_stats.tsv; do
+            test -s results/korv_test/korv_test_$f || { echo "missing korv_test_$f"; exit 1; }
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: korv_test_results
+          path: results/korv_test/
+          if-no-files-found: ignore
+
+  review-page:
+    name: review page unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+      - run: deno test --allow-read --allow-env tests/review_page/core_test.js

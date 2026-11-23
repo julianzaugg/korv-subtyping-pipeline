@@ -1,0 +1,6 @@
+# Local execution only (laptop or server), no scheduler.
+# Always pass --cores explicitly; on shared servers keep total CPU use under 90%.
+use-conda: true
+printshellcmds: true
+keep-going: false
+rerun-incomplete: true

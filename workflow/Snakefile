@@ -1,0 +1,71 @@
+import csv
+import re
+from pathlib import Path
+
+from snakemake.utils import min_version, validate
+
+min_version("8.0")
+
+configfile: "config/config.yaml"
+validate(config, "schemas/config.schema.yaml")
+
+
+include: "rules/common.smk"
+
+NAME = config["analysis_name"]
+OUT = f"{config['outdir']}/{NAME}"
+WORK = f"{OUT}/work"
+START = config["start_from"]
+
+
+if START == "fastq":
+    SAMPLE_ROWS = load_samples(config["samples"])
+elif START == "subsetted_fasta":
+    if not config.get("subsetted_fasta"):
+        raise ValueError("start_from=subsetted_fasta requires config 'subsetted_fasta'")
+    SAMPLE_ROWS = []
+else:
+    raise ValueError(f"unknown start_from: {START}")
+
+_primers = read_fasta_seqs(config["primers"])
+if len(_primers) != 2:
+    raise ValueError(f"{config['primers']}: expected forward and reverse primer, got {len(_primers)} sequences")
+# The reverse primer is given as the CLC adapter (found on the minus strand); in a merged read
+# it appears reverse-complemented at the 3' end.
+config["primer_fwd"] = _primers[0]
+config["primer_rev_rc"] = revcomp(_primers[1])
+
+INTERNAL = [r["internal_id"] for r in SAMPLE_ROWS]
+BY_INTERNAL = {r["internal_id"]: r for r in SAMPLE_ROWS}
+
+include: "rules/preprocess.smk"
+include: "rules/cluster.smk"
+include: "rules/subtype_prep.smk"
+include: "rules/report.smk"
+
+
+rule all:
+    input:
+        f"{OUT}/{NAME}_otu_table_100_with_reps.xlsx",
+        f"{OUT}/{NAME}_final_sequences_to_subtype.fasta",
+        [f"{OUT}/{NAME}_sample_read_stats.tsv"] if START == "fastq" else [],
+        (
+            [f"{OUT}/{NAME}_final_result.xlsx"]
+            if config.get("subtype_assignments")
+            else [
+                f"{OUT}/{NAME}_subtype_suggestions.xlsx",
+                f"{OUT}/{NAME}_subtype_review.html",
+                f"{OUT}/review_figures/{NAME}_tree_cladogram.pdf",
+                f"{OUT}/review_figures/{NAME}_tree_distance.pdf",
+            ]
+        ),
+
+
+onsuccess:
+    if not config.get("subtype_assignments"):
+        print(
+            f"\nSubtyping preparation finished.\n"
+            f"1. Open {OUT}/{NAME}_subtype_review.html in a browser (or review {OUT}/{NAME}_subtype_suggestions.xlsx and {OUT}/review_figures/)\n"
+            f"2. Assign the subtypes, in the page (Export xlsx) or in the suggestions workbook (Subtype column, Endogenous if used)\n"
+            f"3. Set 'subtype_assignments: /path/to/the/completed/file.xlsx' in the config and run the same command again."
+        )

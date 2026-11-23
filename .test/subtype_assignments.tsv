@@ -1,0 +1,7 @@
+seq_md5	Subtype	Endogenous	Note
+a0b7282ac1eb09ae271ccb031da7f6d7	A	Endogenous	korv_A
+cf64711835bcd68702cd3d7b7be2a21b	B	Exogenous	korv_B
+fe5666a6d995457f4c1f744e93386fa6	D	Exogenous	korv_D
+5bf286298aae1fde9d4d9494f0df7565	L	Exogenous	korv_L
+ad35a31f6d28dd2407513e6d1bf04e8d	Non-functional		nonfunctional_stop
+553a3a5eb8985f4062268735a2ef73d0	I	Exogenous	korv_I_variant

@@ -1,0 +1,43 @@
+# KoRV classification pipeline - default configuration.
+# Copy this file per analysis, or override on the command line with --config key=value.
+
+analysis_name: korv_analysis          # prefix for outputs, e.g. my_analysis
+samples: config/samples.tsv           # sample sheet, see config/samples_template.tsv
+outdir: results                       # everything is written under <outdir>/<analysis_name>/
+
+# Where to start. "fastq" is the normal entry point. "subsetted_fasta" is only used to
+# validate against legacy CLC outputs (headers must be <sample_id>-<read number>).
+start_from: fastq
+subsetted_fasta: null
+
+# Stage 1 - preprocessing (replaces CLC)
+primers: resources/ENV_primers.fasta
+primer_error_rate: 0.12               # cutadapt -e; 0.12 allows 2 mismatches per primer (best match to CLC retention)
+quality_cutoff: 13                    # end-quality trimming after primer removal (CLC default limit 0.05)
+merge_max_diffs: 6                      # vsearch --fastq_maxdiffs; 6 best reproduces CLC merged counts on good and poor runs
+min_len: 400
+max_len: 600
+max_n: 0
+merge_min_overlap: 10
+subsample_depth: 15000                # integer, or null for no subsampling (use every read)
+subsample_seed: 1
+
+# Stage 2 - clustering
+# true: dereplicate identical reads first (fast). false: exact legacy behaviour, validation only.
+dereplicate: true
+min_total_reads_100: 3                # drop 100% OTUs with fewer reads in total
+cluster_id_100: 1.0
+cluster_id_97: 0.97
+# legacy: every 100% rep has abundance 1 when clustering at 97% (reproduces QIIME runs)
+# abundance: real read counts, so centroids are the dominant variants
+cluster97_order: legacy
+
+# Stage 3 - subtyping preparation
+references: resources/ENV_reference_sequence_translations_A-N.fasta
+subtype_library: resources/subtype_library.tsv
+nonfunctional_rules: resources/nonfunctional_rules.yaml
+
+# Stage 4 - report
+subtype_assignments: null             # path to the expert-completed assignments (.xlsx, .tsv or .csv)
+
+threads: 4

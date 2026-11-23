@@ -1,0 +1,14 @@
+# Per-analysis configuration. Copy this file, edit it, and pass it with --configfile.
+# Only the keys below are usually needed; any other key from config/config.yaml
+# (filters, clustering, thresholds) can be added here to override its default.
+
+analysis_name: my_analysis            # prefix for outputs; letters, digits, '_', '.' and '-'
+samples: /path/to/samples.tsv         # sample sheet: sample_id, R1, R2 (+ optional metadata columns)
+outdir: results                       # outputs go to <outdir>/<analysis_name>/
+
+# Leave null for the first run. After assigning the subtypes in the review page
+# (Export xlsx) or in the suggestions workbook, set the path and run again.
+subtype_assignments: null
+
+# threads: 4                          # threads for the multi-threaded steps (keep <= --cores)
+# subsample_depth: 15000              # reads per sample after filtering, null to use every read

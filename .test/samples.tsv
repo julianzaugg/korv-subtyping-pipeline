@@ -1,0 +1,4 @@
+sample_id	R1	R2	Site
+TEST_01	data/TEST_01_S1_L001_R1_001.fastq.gz	data/TEST_01_S1_L001_R2_001.fastq.gz	Site_1
+TEST_02	data/TEST_02_S1_L001_R1_001.fastq.gz	data/TEST_02_S1_L001_R2_001.fastq.gz	Site_1
+TEST-03	data/TEST_03_S1_L001_R1_001.fastq.gz	data/TEST_03_S1_L001_R2_001.fastq.gz	Site_2

@@ -1,0 +1,14 @@
+# Environment that runs the pipeline. Each rule builds its own tool environment
+# from workflow/envs/ on the first run (--use-conda in profiles/default).
+#   conda env create -f environment.yml
+#   conda activate korv
+name: korv
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - snakemake=9.27.2
+  # Snakemake calls conda to build the rule environments and needs conda >= 24.7.1;
+  # installing it here means an older base conda does not matter.
+  - conda>=24.7.1

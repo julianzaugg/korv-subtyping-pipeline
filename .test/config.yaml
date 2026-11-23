@@ -1,0 +1,10 @@
+# Configuration for the bundled synthetic test (see .test/README.md).
+# Run from the repository root:
+#   snakemake --cores 2 --configfile .test/config.yaml
+analysis_name: korv_test
+samples: .test/samples.tsv            # relative R1/R2 paths are read from the sample sheet's folder
+outdir: results
+subsample_depth: null                 # the test samples are small, keep every read
+subtype_library: .test/subtype_library.tsv   # a tiny library, so the test does not depend on resources/
+threads: 2
+subtype_assignments: null             # second run: --config subtype_assignments=.test/subtype_assignments.tsv

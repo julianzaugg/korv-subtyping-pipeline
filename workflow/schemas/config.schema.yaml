@@ -1,0 +1,48 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: KoRV classification pipeline configuration (defaults in config/config.yaml)
+type: object
+properties:
+  analysis_name:
+    type: string
+    pattern: "^[A-Za-z0-9_.-]+$"
+    description: prefix for all outputs; letters, digits, '_', '.' and '-' only
+  samples: {type: string, description: tab-separated sample sheet with sample_id, R1, R2}
+  outdir: {type: string}
+  start_from: {type: string, enum: [fastq, subsetted_fasta]}
+  subsetted_fasta: {type: ["string", "null"]}
+  primers: {type: string}
+  primer_error_rate: {type: number, minimum: 0, maximum: 1}
+  quality_cutoff: {type: integer, minimum: 0}
+  merge_max_diffs: {type: integer, minimum: 0}
+  min_len: {type: integer, minimum: 1}
+  max_len: {type: integer, minimum: 1}
+  max_n: {type: integer, minimum: 0}
+  merge_min_overlap: {type: integer, minimum: 1}
+  subsample_depth: {type: ["integer", "null"], minimum: 1}
+  subsample_seed: {type: integer}
+  dereplicate: {type: boolean}
+  min_total_reads_100: {type: integer, minimum: 1}
+  cluster_id_100: {type: number, minimum: 0, maximum: 1}
+  cluster_id_97: {type: number, minimum: 0, maximum: 1}
+  cluster97_order: {type: string, enum: [legacy, abundance]}
+  references: {type: string}
+  subtype_library: {type: string}
+  nonfunctional_rules: {type: string}
+  subtype_assignments: {type: ["string", "null"]}
+  extra_categories:
+    type: array
+    items: {type: string}
+    description: assignment columns summarised as extra report sheets (default [Endogenous])
+  threads: {type: integer, minimum: 1}
+# a misspelled key is an error rather than silently ignored
+additionalProperties: false
+required:
+  - analysis_name
+  - samples
+  - outdir
+  - start_from
+  - primers
+  - references
+  - subtype_library
+  - nonfunctional_rules
+  - threads

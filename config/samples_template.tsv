@@ -1,0 +1,2 @@
+sample_id	R1	R2	Name
+EXAMPLE_01	/path/to/EXAMPLE_01_S1_L001_R1_001.fastq.gz	/path/to/EXAMPLE_01_S1_L001_R2_001.fastq.gz	Optional free metadata column

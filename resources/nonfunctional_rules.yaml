@@ -1,0 +1,51 @@
+# Criteria used to flag sequences and to suggest "Non-functional" (from the processing notes).
+# These only produce suggestions and flags for the expert; they never assign a subtype.
+# Deletions are measured in base pairs (residues in the protein alignment x 3), relative to the
+# nearest A-N reference of each sequence.
+
+internal_stops:
+  max: 0                       # any stop codon before the final residue is flagged
+
+conserved_regions:
+  max_deletion_bp: 4           # internal deletion in conserved regions, more than this is flagged
+  max_terminal_missing_bp: 4   # missing sequence at either end of the amplicon, more than this is flagged
+
+nqqhnn_zone:                   # the NQQHNN zone near the start: very variable, half the time missing bits
+  reference: "KoRV-A_[Hanger_2000]_(+3)"   # reference whose coordinates define the zone
+  left_anchor: "GGAEM"         # zone = residues between these two anchors in that reference
+  right_anchor: "PHQPM"
+  max_missing_bp: 5            # more liberal here (accepts 4-5 bp)
+
+variable_region:               # the indel-rich block that differs between subtypes (not the NQQHNN zone)
+  reference: "KoRV-A_[Hanger_2000]_(+3)"   # reference whose coordinates define the region
+  left_anchor: "ASQQA"         # region = residues between these two anchors in that reference
+  right_anchor: "LGCSY"        # (A reference: ASQQA RPPDSNYEH----AYNQITWGT LGCSY)
+  # Indels here are expected, so they are not counted as deletions in conserved regions and the call
+  # needs human review. The one exception is a region with fewer residues than any complete reference
+  # (KoRV-A, the shortest, has 18): in the curated library 17 of the 18 such sequences without a stop codon
+  # are non-functional (typically the 11 residue form that lacks the middle of the region).
+  min_residues: 18             # flag variable_region_short below this, set to null to switch the flag off
+
+novelty:                       # a sequence far from everything known is flagged as a possible new subtype (rare)
+  min_conserved_identity: 0.80 # protein identity to the nearest A-N reference over the conserved columns
+                               # (outside the NQQHNN zone and the variable region). Known functional sequences in
+                               # three validation datasets reach down to 0.85 here (0.82 over the whole protein),
+                               # so 0.90 called ordinary divergent B and M sequences novel
+  min_library_identity: 0.95   # nucleotide identity to the nearest curated library sequence
+
+suggestion:
+  high_library_identity: 0.995      # nucleotide identity needed for a "high" confidence library suggestion
+  check_library_identity: 0.97      # between this and the above: suggestion marked "check"
+  label_agreement_window: 0.01      # library hits within this identity of the best must agree on the label
+  top_hits: 5                       # nearest library sequences reported per sequence
+
+chimera:
+  tool: uchime3_denovo              # run on the final representatives with their read counts as abundance
+
+subtype_order:                      # row order of the review page when it is sorted by subtype (the default)
+  order: [A, B, C, D, E, F, G, H, I, K, L, M, N]   # alphabetical; "possible new subtype", other labels and
+                                    # Non-functional follow, in that order
+  intermediates:                    # an intermediate sits next to its "nearer" parent, on the side facing the other
+    QL: {parents: [L, A], nearer: L}   # parent; from the nearest and second-nearest references of expert-labelled
+    QD: {parents: [D, L], nearer: D}   # QL and QD sequences. Labels written "X/Y" (A/D, L/D) are placed
+                                    # automatically, next to X on the side facing Y.

@@ -1,0 +1,25 @@
+# data and outputs never go in git
+raw_reads/
+test_data/
+reference_jobs/
+results/
+.snakemake/
+*.fastq
+*.fastq.gz
+# the synthetic test data is the one exception
+!.test/data/*.fastq.gz
+*.qza
+*.biom
+# spreadsheets only where explicitly tracked
+*.xlsx
+!resources/**/*.xlsx
+!tests/expected/**/*.xlsx
+# OS / editor / R
+.DS_Store
+~$*
+.Rhistory
+.Rproj.user/
+# credentials, never
+*.pem
+*.key
+.env

@@ -15,6 +15,7 @@ include: "rules/common.smk"
 NAME = config["analysis_name"]
 OUT = f"{config['outdir']}/{NAME}"
 WORK = f"{OUT}/work"
+S3 = f"{OUT}/subtyping"
 START = config["start_from"]
 
 

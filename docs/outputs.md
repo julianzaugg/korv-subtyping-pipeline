@@ -22,7 +22,7 @@ Everything else is a record of intermediate steps.
 | File | Content |
 |---|---|
 | `<name>_sample_read_stats.tsv` | one row per sample: `Raw read pairs`; `Number of reads` and `Avg.length` (merged reads and their mean length); `Number of reads after trim` and `Avg.length after trim` (reads with both primers found that pass the quality, length and ambiguous-base filters, after primer removal); `Percentage trimmed (%)`, which despite its name is the percentage of merged reads that were kept; `Number of reads subsampled` (the reads used downstream, capped by `subsample_depth`) |
-| `<name>_otu_table_100_filtered_counts.csv` | per sample: the number of reads in the 100% OTUs before and after dropping OTUs with fewer than 3 reads, and the number of reads removed |
+| `<name>_otu_table_100_filtered_counts.csv` | per sample: the number of reads in the 100% OTUs before and after dropping OTUs with fewer than 3 reads and chimeric OTUs, the number of reads removed by the read filter, and the number of reads in chimeric OTUs (`Reads_chimeric`) |
 | `<name>_otu_table_100_greater_than_2.csv` | the abundance table of the 100% OTUs that passed the filter (one row per OTU, one column per sample, read counts) |
 | `<name>_rep_sequences_100_greater_than_2.fasta` | the sequences of those 100% OTUs |
 | `<name>_otu_table_100_with_reps.xlsx` | sheet `OTU_table_100_filt_with_reps`: each 100% OTU with the 97% cluster it belongs to and its counts per sample. Sheet `OTU_table_100_agg_per_rep_97`: the same counts summed per 97% representative (`new_rep_97_ID`, `Cluster_ID`, `N_samples_present`, `Total_number_of_reads`, then one column per sample) |
@@ -44,7 +44,7 @@ Read headers are `<sample_id>-<number>`, so a representative ID such as `S1-0000
 | `review_figures/` | PDF and PNG of the figures in section 3.1 |
 | `subtyping/translation.tsv` | the chosen translation of each representative: strand, frame, protein, alignment scores of the best and the runner-up frame, internal stop count |
 | `subtyping/library_hits.tsv` | every library sequence at 80% nucleotide identity or more to each representative: query, library checksum, identity, query coverage, target coverage (no header) |
-| `subtyping/chimeras.fasta` | the representatives called chimeric by `uchime3_denovo` |
+| `subtyping/chimeras.fasta` | the 100% OTUs called chimeric by `uchime3_denovo`; removed from the results when `remove_chimeras` is true (the default) |
 | `subtyping/evidence.tsv` | the full evidence table behind the workbook, with extra columns (section 5) |
 | `subtyping/logs/` | the logs of MAFFT, IQ-TREE, vsearch library search and uchime |
 
@@ -175,6 +175,7 @@ Flags:
 
 The first four and `variable_region_short` are the non-functional features that can lead to a `Non-functional` suggestion.
 `possible_chimera` is shown but does not change the suggestion.
+It only appears when `remove_chimeras` is false, because chimeric OTUs are otherwise removed before the representatives are chosen.
 Other indels in the variable region are not flagged: they are expected and are for you to judge.
 
 ### 4.4 Nearest references

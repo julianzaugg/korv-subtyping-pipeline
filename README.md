@@ -160,7 +160,7 @@ Every file and every column of the suggestions workbook is explained in [docs/ou
 | File | Content |
 |---|---|
 | `*_sample_read_stats.tsv` | reads per processing step per sample (same columns as the old `*_data.xlsx`) |
-| `*_otu_table_100_filtered_counts.csv` | reads before and after the minimum-read filter per sample |
+| `*_otu_table_100_filtered_counts.csv` | reads before and after the minimum-read and chimera filters per sample |
 | `*_otu_table_100_with_reps.xlsx` | 100% OTUs with their 97% cluster, and counts collapsed per 97% representative |
 | `*_final_sequences_to_subtype.fasta/.tsv/.faa` | the representatives to subtype (nucleotide, table with `seq_md5`, protein) |
 | `*_final_sequences_to_subtype_with_references.aln/.treefile/.iqtree` | alignment and tree with the A-N references |

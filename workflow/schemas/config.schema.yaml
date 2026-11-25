@@ -22,6 +22,7 @@ properties:
   subsample_seed: {type: integer}
   dereplicate: {type: boolean}
   min_total_reads_100: {type: integer, minimum: 1}
+  remove_chimeras: {type: boolean}
   cluster_id_100: {type: number, minimum: 0, maximum: 1}
   cluster_id_97: {type: number, minimum: 0, maximum: 1}
   cluster97_order: {type: string, enum: [legacy, abundance]}

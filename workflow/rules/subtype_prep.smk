@@ -4,7 +4,6 @@
 REFS = config["references"]
 LIB = config["subtype_library"]
 RULES = config["nonfunctional_rules"]
-S3 = f"{OUT}/subtyping"
 FINAL = f"{OUT}/{NAME}_final_sequences_to_subtype"
 
 
@@ -55,23 +54,6 @@ rule tree:
         f"{S3}/logs/iqtree.log",
     shell:
         "iqtree2 -s {input} -m MFP -mset LG --threads-max {threads} -nt AUTO --prefix {params.prefix} -redo &> {log}"
-
-
-rule chimera_check:
-    input:
-        tsv=f"{FINAL}.tsv",
-    output:
-        chimeras=f"{S3}/chimeras.fasta",
-        sized=f"{S3}/final_sized.fasta",
-    conda:
-        "../envs/vsearch.yaml"
-    log:
-        f"{S3}/logs/uchime.log",
-    shell:
-        r"""
-        awk -F'\t' 'NR>1{{print ">"$1";size="$4"\n"$5}}' {input.tsv} > {output.sized}
-        vsearch --uchime3_denovo {output.sized} --chimeras {output.chimeras} --nonchimeras /dev/null &> {log}
-        """
 
 
 rule library_fasta:

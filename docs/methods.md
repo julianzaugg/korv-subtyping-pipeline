@@ -52,7 +52,7 @@ The library records past expert decisions for exact sequences and is plain text,
 All steps are run separately for each sample.
 
 1. **Merging.**
-   Read pairs are merged with `vsearch --fastq_mergepairs` (vsearch 2.28.1), with a minimum overlap of 10 bases and at most 6 mismatches in the overlap (`merge_max_diffs`).
+   Read pairs are merged with `vsearch --fastq_mergepairs` (vsearch 2.28.1), with a minimum overlap of 20 bases (`merge_min_overlap`) and at most 6 mismatches in the overlap (`merge_max_diffs`).
    Pairs that do not merge are discarded.
 2. **Primer trimming.**
    Both primers must be present, otherwise the read is discarded.
@@ -86,11 +86,15 @@ The sample and read count of each sequence are tracked through vsearch `.uc` mem
    100% OTUs with fewer than 3 reads in total across all samples are removed (`min_total_reads_100`).
    This removes most sequencing-error variants.
    The number of reads removed per sample is recorded.
-4. **97% clustering.**
+4. **Chimera removal.**
+   The remaining 100% OTUs are checked with `vsearch --uchime3_denovo`, using their total read counts as abundance.
+   OTUs called chimeric are removed from the tables and sequences before 97% clustering (`remove_chimeras`, default `true`), and the number of chimeric reads per sample is recorded.
+   With `remove_chimeras: false` nothing is removed and the calls only appear as the `possible_chimera` flag.
+5. **97% clustering.**
    The remaining 100% OTU sequences are clustered at 97% identity (`cluster_id_97`) with `vsearch --cluster_size`.
    In the default `legacy` order every 100% OTU is given abundance 1 when clustering, so each unique sequence counts equally, as in QIIME 2 style workflows.
    The alternative `abundance` order uses the real read counts, so that cluster centres are the dominant variants.
-5. **Representative sequences.**
+6. **Representative sequences.**
    The representative of each 97% cluster is its member 100% OTU with the most reads.
    Read counts of all members are summed per sample, giving a table of reads per representative and sample.
    The representatives are the sequences passed to Stage 3.
@@ -111,10 +115,11 @@ For the alignment, stop codons are written as `X`.
 The representative proteins and the 13 references are aligned with MAFFT 7.526 (`--localpair --maxiterate 1000 --op 10 --ep 1`).
 A maximum-likelihood tree is built with IQ-TREE 2.3.5, with ModelFinder restricted to the LG family of protein models (`-m MFP -mset LG`).
 
-### 5.3 Chimera check
+### 5.3 Chimera flag
 
-Representatives are checked with `vsearch --uchime3_denovo`, using their total read counts as abundance.
-A positive result is a flag and is never used to remove a sequence.
+The chimera check is run in Stage 2 (step 4).
+By default chimeric OTUs are removed there, so none reach the representatives.
+With `remove_chimeras: false` the representatives that were called chimeric are flagged `possible_chimera`, which is a flag only.
 
 ### 5.4 Comparison with the library
 

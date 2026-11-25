@@ -18,7 +18,7 @@ merge_max_diffs: 6                      # vsearch --fastq_maxdiffs; 6 best repro
 min_len: 400
 max_len: 600
 max_n: 0
-merge_min_overlap: 10
+merge_min_overlap: 20                 # vsearch --fastq_minovlen
 subsample_depth: 15000                # integer, or null for no subsampling (use every read)
 subsample_seed: 1
 
@@ -26,6 +26,7 @@ subsample_seed: 1
 # true: dereplicate identical reads first (fast). false: exact legacy behaviour, validation only.
 dereplicate: true
 min_total_reads_100: 3                # drop 100% OTUs with fewer reads in total
+remove_chimeras: true                 # drop 100% OTUs called chimeric by uchime3_denovo; false only flags them
 cluster_id_100: 1.0
 cluster_id_97: 0.97
 # legacy: every 100% rep has abundance 1 when clustering at 97% (reproduces QIIME runs)
